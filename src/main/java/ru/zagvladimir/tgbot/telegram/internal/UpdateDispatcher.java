@@ -5,14 +5,11 @@ import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.generics.TelegramClient;
+import ru.zagvladimir.tgbot.telegram.MessageSender;
 
 @Component
 class UpdateDispatcher implements LongPollingUpdateConsumer {
@@ -20,12 +17,14 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
     private static final Logger log = LoggerFactory.getLogger(UpdateDispatcher.class);
 
     private final ExecutorService executor;
-    private final ObjectProvider<TelegramClient> telegramClient;
+    private final CommandRegistry registry;
+    private final MessageSender sender;
 
     UpdateDispatcher(
-            @Qualifier("botUpdateExecutor") ExecutorService executor, ObjectProvider<TelegramClient> telegramClient) {
+            @Qualifier("botUpdateExecutor") ExecutorService executor, CommandRegistry registry, MessageSender sender) {
         this.executor = executor;
-        this.telegramClient = telegramClient;
+        this.registry = registry;
+        this.sender = sender;
     }
 
     @Override
@@ -52,8 +51,9 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
 
         try {
             dispatch(request);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             log.error("Не удалось обработать апдейт", e);
+            reportFailure(context);
         } finally {
             MDC.clear();
         }
@@ -68,25 +68,27 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
     }
 
     private void handleCommand(BotRequest.Command command) {
-        if (!"/start".equals(command.command())) {
-            log.debug("Команда {} ещё не реализована", command.command());
+        var handler = registry.find(command.command()).orElse(null);
+        if (handler == null) {
+            if (!command.fromGroup()) {
+                sender.sendText(command.chatId(), "Не знаю такой команды. Что я умею — /help");
+            }
             return;
         }
 
-        send(command.chatId(), "Привет. Бот на связи, команды появятся по мере разработки.");
+        handler.handle(CommandContext.from(command));
     }
 
-    private void send(long chatId, String text) {
-        var client = telegramClient.getIfAvailable();
-        if (client == null) {
-            log.warn("Нечем отправить сообщение в чат {}: TelegramClient не сконфигурирован", chatId);
+    private void reportFailure(BotContext context) {
+        var chatId = context.chatId();
+        if (chatId == null) {
             return;
         }
 
         try {
-            client.execute(SendMessage.builder().chatId(chatId).text(text).build());
-        } catch (TelegramApiException e) {
-            log.error("Не удалось отправить сообщение в чат {}", chatId, e);
+            sender.sendText(chatId, "Что-то пошло не так, уже разбираюсь. Попробуйте ещё раз чуть позже.");
+        } catch (Exception e) {
+            log.error("Не удалось сообщить об ошибке в чат {}", chatId, e);
         }
     }
 }
