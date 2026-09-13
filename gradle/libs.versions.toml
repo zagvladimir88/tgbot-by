@@ -6,6 +6,7 @@ spotless = "7.0.4"
 palantir-java-format = "2.68.0"
 telegrambots = "9.0.0"
 wiremock = "3.13.1"
+jfreechart = "1.5.5"
 
 [libraries]
 spring-modulith-bom = { module = "org.springframework.modulith:spring-modulith-bom", version.ref = "spring-modulith" }
@@ -34,6 +35,7 @@ spring-modulith-actuator = { module = "org.springframework.modulith:spring-modul
 spring-modulith-runtime = { module = "org.springframework.modulith:spring-modulith-runtime" }
 jspecify = { module = "org.jspecify:jspecify" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
+jfreechart = { module = "org.jfree:jfreechart", version.ref = "jfreechart" }
 
 spring-boot-starter-actuator-test = { module = "org.springframework.boot:spring-boot-starter-actuator-test" }
 spring-boot-starter-cache-test = { module = "org.springframework.boot:spring-boot-starter-cache-test" }
