@@ -26,6 +26,10 @@ public class MessageSender {
         send(SendMessage.builder().chatId(chatId).text(text).build());
     }
 
+    public void sendHtml(long chatId, String html) {
+        send(SendMessage.builder().chatId(chatId).text(html).parseMode("HTML").build());
+    }
+
     public void sendMarkdown(long chatId, String markdown) {
         send(SendMessage.builder()
                 .chatId(chatId)
