@@ -3,22 +3,43 @@ package ru.zagvladimir.tgbot.subscription;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.stereotype.Service;
+import ru.zagvladimir.tgbot.subscription.model.RateAlert;
+import ru.zagvladimir.tgbot.subscription.model.RateAlertCondition;
+import ru.zagvladimir.tgbot.subscription.port.RateAlertRepository;
 
-public interface RateAlertService {
+@Service
+public class RateAlertService {
 
-    RateAlert create(
+    private final RateAlertRepository repository;
+
+    RateAlertService(RateAlertRepository repository) {
+        this.repository = repository;
+    }
+
+    public RateAlert create(
             long chatId,
             long userId,
             String currency,
             RateAlertCondition condition,
             BigDecimal threshold,
-            boolean oneShot);
+            boolean oneShot) {
+        return repository.create(chatId, userId, currency, condition, threshold, oneShot);
+    }
 
-    List<RateAlert> activeAlerts();
+    public List<RateAlert> activeAlerts() {
+        return repository.findActive();
+    }
 
-    List<RateAlert> forChat(long chatId);
+    public List<RateAlert> forChat(long chatId) {
+        return repository.findByChat(chatId);
+    }
 
-    boolean remove(long chatId, long alertId);
+    public boolean remove(long chatId, long alertId) {
+        return repository.delete(chatId, alertId);
+    }
 
-    void markFired(long alertId, LocalDate onDate);
+    public void markFired(long alertId, LocalDate onDate) {
+        repository.markFired(alertId, onDate);
+    }
 }
