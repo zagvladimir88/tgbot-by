@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.spotless)
 }
 
-group = 'ru.strjk'
+group = 'ru.zagvladimir'
 version = '0.0.1-SNAPSHOT'
 description = 'Telegram bot: weather, NBRB rates, image search, keyboard layout'
 

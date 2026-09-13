@@ -1,4 +1,4 @@
-package ru.strjk.tgbot.telegram;
+package ru.zagvladimir.tgbot.telegram;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
