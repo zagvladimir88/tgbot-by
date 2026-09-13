@@ -30,6 +30,7 @@ spring-modulith-observability-api = { module = "org.springframework.modulith:spr
 spring-modulith-observability-core = { module = "org.springframework.modulith:spring-modulith-observability-core" }
 spring-modulith-actuator = { module = "org.springframework.modulith:spring-modulith-actuator" }
 spring-modulith-runtime = { module = "org.springframework.modulith:spring-modulith-runtime" }
+jspecify = { module = "org.jspecify:jspecify" }
 
 spring-boot-starter-actuator-test = { module = "org.springframework.boot:spring-boot-starter-actuator-test" }
 spring-boot-starter-cache-test = { module = "org.springframework.boot:spring-boot-starter-cache-test" }
@@ -39,6 +40,7 @@ spring-boot-starter-validation-test = { module = "org.springframework.boot:sprin
 spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
 spring-boot-testcontainers = { module = "org.springframework.boot:spring-boot-testcontainers" }
 spring-modulith-starter-test = { module = "org.springframework.modulith:spring-modulith-starter-test" }
+spring-modulith-docs = { module = "org.springframework.modulith:spring-modulith-docs" }
 testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
