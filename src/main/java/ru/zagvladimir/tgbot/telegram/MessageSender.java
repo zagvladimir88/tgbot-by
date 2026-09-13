@@ -7,6 +7,8 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -36,6 +38,25 @@ public class MessageSender {
                 .text(markdown)
                 .parseMode("MarkdownV2")
                 .build());
+    }
+
+    public void sendPhoto(long chatId, byte[] image, String fileName, String caption) {
+        var client = telegramClient.getIfAvailable();
+        if (client == null) {
+            log.warn("Картинка в чат {} не отправлена: TelegramClient не сконфигурирован", chatId);
+            return;
+        }
+
+        try {
+            client.execute(SendPhoto.builder()
+                    .chatId(chatId)
+                    .photo(new InputFile(new java.io.ByteArrayInputStream(image), fileName))
+                    .caption(caption)
+                    .parseMode("HTML")
+                    .build());
+        } catch (TelegramApiException e) {
+            log.error("Не удалось отправить картинку в чат {}", chatId, e);
+        }
     }
 
     public void answerInlineQuery(String queryId, List<InlineQueryResult> results) {

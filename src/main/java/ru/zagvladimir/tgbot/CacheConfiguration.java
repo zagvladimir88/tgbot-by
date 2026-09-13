@@ -30,6 +30,13 @@ class CacheConfiguration {
                         .maximumSize(500)
                         .build());
 
+        manager.registerCustomCache(
+                "currency-directory",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(Duration.ofDays(1))
+                        .maximumSize(10)
+                        .build());
+
         return manager;
     }
 }

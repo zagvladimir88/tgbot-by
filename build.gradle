@@ -29,6 +29,7 @@ dependencies {
     implementation libs.spring.boot.starter.restclient
     implementation libs.jspecify
     implementation libs.caffeine
+    implementation libs.jfreechart
     implementation libs.telegrambots.longpolling
     implementation libs.telegrambots.client
     implementation libs.flyway.database.postgresql
@@ -89,4 +90,5 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('test') {
     useJUnitPlatform()
     systemProperty 'file.encoding', 'UTF-8'
+    systemProperty 'java.awt.headless', 'true'
 }
