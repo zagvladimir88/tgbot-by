@@ -20,16 +20,19 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
     private final CommandRegistry registry;
     private final MessageSender sender;
     private final List<InlineHandler> inlineHandlers;
+    private final List<CallbackHandler> callbackHandlers;
 
     UpdateDispatcher(
             @Qualifier("botUpdateExecutor") ExecutorService executor,
             CommandRegistry registry,
             MessageSender sender,
-            List<InlineHandler> inlineHandlers) {
+            List<InlineHandler> inlineHandlers,
+            List<CallbackHandler> callbackHandlers) {
         this.executor = executor;
         this.registry = registry;
         this.sender = sender;
         this.inlineHandlers = inlineHandlers;
+        this.callbackHandlers = callbackHandlers;
     }
 
     @Override
@@ -68,7 +71,7 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
         switch (request) {
             case BotRequest.Command command -> handleCommand(command);
             case BotRequest.Inline inline -> handleInline(inline);
-            case BotRequest.Callback callback -> log.debug("Callback ещё не поддерживается: {}", callback.data());
+            case BotRequest.Callback callback -> handleCallback(callback);
         }
     }
 
@@ -96,6 +99,15 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
         }
 
         sender.answerInlineQuery(inline.queryId(), results);
+    }
+
+    private void handleCallback(BotRequest.Callback callback) {
+        callbackHandlers.stream()
+                .filter(handler -> callback.data().startsWith(handler.prefix()))
+                .findFirst()
+                .ifPresentOrElse(
+                        handler -> handler.handle(callback),
+                        () -> log.debug("Некому обработать callback {}", callback.data()));
     }
 
     private void reportFailure(BotContext context) {

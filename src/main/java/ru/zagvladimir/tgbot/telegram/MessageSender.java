@@ -5,11 +5,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
+import org.telegram.telegrambots.meta.api.methods.AnswerCallbackQuery;
 import org.telegram.telegrambots.meta.api.methods.AnswerInlineQuery;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageMedia;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQueryResult;
+import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
@@ -56,6 +60,64 @@ public class MessageSender {
                     .build());
         } catch (TelegramApiException e) {
             log.error("Не удалось отправить картинку в чат {}", chatId, e);
+        }
+    }
+
+    public void sendPhotoByUrl(long chatId, String url, String caption, InlineKeyboardMarkup keyboard) {
+        var client = telegramClient.getIfAvailable();
+        if (client == null) {
+            log.warn("Картинка в чат {} не отправлена: TelegramClient не сконфигурирован", chatId);
+            return;
+        }
+
+        try {
+            client.execute(SendPhoto.builder()
+                    .chatId(chatId)
+                    .photo(new InputFile(url))
+                    .caption(caption)
+                    .parseMode("HTML")
+                    .replyMarkup(keyboard)
+                    .build());
+        } catch (TelegramApiException e) {
+            log.error("Не удалось отправить картинку в чат {}", chatId, e);
+        }
+    }
+
+    public void editPhotoByUrl(long chatId, int messageId, String url, String caption, InlineKeyboardMarkup keyboard) {
+        var client = telegramClient.getIfAvailable();
+        if (client == null) {
+            return;
+        }
+
+        try {
+            client.execute(EditMessageMedia.builder()
+                    .chatId(chatId)
+                    .messageId(messageId)
+                    .media(InputMediaPhoto.builder()
+                            .media(url)
+                            .caption(caption)
+                            .parseMode("HTML")
+                            .build())
+                    .replyMarkup(keyboard)
+                    .build());
+        } catch (TelegramApiException e) {
+            log.error("Не удалось обновить картинку в чате {}", chatId, e);
+        }
+    }
+
+    public void answerCallback(String callbackId, String text) {
+        var client = telegramClient.getIfAvailable();
+        if (client == null) {
+            return;
+        }
+
+        try {
+            client.execute(AnswerCallbackQuery.builder()
+                    .callbackQueryId(callbackId)
+                    .text(text)
+                    .build());
+        } catch (TelegramApiException e) {
+            log.error("Не удалось ответить на callback {}", callbackId, e);
         }
     }
 

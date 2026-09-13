@@ -37,6 +37,13 @@ class CacheConfiguration {
                         .maximumSize(10)
                         .build());
 
+        manager.registerCustomCache(
+                "image-search",
+                Caffeine.newBuilder()
+                        .expireAfterWrite(Duration.ofHours(24))
+                        .maximumSize(2_000)
+                        .build());
+
         return manager;
     }
 }
