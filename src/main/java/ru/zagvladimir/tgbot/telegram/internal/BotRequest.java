@@ -2,7 +2,7 @@ package ru.zagvladimir.tgbot.telegram.internal;
 
 import org.jspecify.annotations.Nullable;
 
-sealed interface BotRequest {
+public sealed interface BotRequest {
 
     long userId();
 
