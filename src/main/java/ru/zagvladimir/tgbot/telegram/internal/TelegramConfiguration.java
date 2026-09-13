@@ -1,5 +1,7 @@
 package ru.zagvladimir.tgbot.telegram.internal;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,6 +19,11 @@ import ru.zagvladimir.tgbot.telegram.BotProperties;
 class TelegramConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(TelegramConfiguration.class);
+
+    @Bean(destroyMethod = "shutdown")
+    ExecutorService botUpdateExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
+    }
 
     @Bean
     @ConditionalOnProperty(prefix = "bot.telegram", name = "token")
