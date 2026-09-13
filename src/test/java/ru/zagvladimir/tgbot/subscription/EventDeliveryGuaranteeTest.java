@@ -23,9 +23,11 @@ import org.springframework.modulith.events.IncompleteEventPublications;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.support.TransactionTemplate;
 import ru.zagvladimir.tgbot.TestcontainersConfiguration;
-import ru.zagvladimir.tgbot.currency.CurrencyService;
-import ru.zagvladimir.tgbot.telegram.MessageSender;
-import ru.zagvladimir.tgbot.weather.WeatherService;
+import ru.zagvladimir.tgbot.domain.currency.CurrencyService;
+import ru.zagvladimir.tgbot.domain.weather.WeatherService;
+import ru.zagvladimir.tgbot.subscription.event.SubscriptionDue;
+import ru.zagvladimir.tgbot.subscription.model.SubscriptionType;
+import ru.zagvladimir.tgbot.telegram.sender.MessageSender;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
