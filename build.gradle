@@ -26,6 +26,8 @@ dependencies {
     implementation libs.spring.boot.starter.flyway
     implementation libs.spring.boot.starter.validation
     implementation libs.spring.boot.starter.webmvc
+    implementation libs.telegrambots.longpolling
+    implementation libs.telegrambots.client
     implementation libs.flyway.database.postgresql
     implementation libs.spring.modulith.observability.api
     implementation libs.spring.modulith.starter.core
