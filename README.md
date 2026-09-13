@@ -47,3 +47,29 @@ BOT_TELEGRAM_TOKEN=<token> ./gradlew bootRun
 ```bash
 ./gradlew build
 ```
+
+Проверки, которые выполняются при сборке: Spotless, Error Prone + NullAway,
+границы модулей (Spring Modulith и ArchUnit), тесты на Testcontainers и порог покрытия JaCoCo.
+
+## Развёртывание
+
+Образ собирается в GitHub Actions при каждом мерже в `master` и публикуется
+в `ghcr.io/zagvladimir88/tgbot-by`.
+
+Локально:
+
+```bash
+./gradlew bootJar
+docker build -t tgbot-by:local .
+```
+
+На сервере:
+
+```bash
+cp .env.example .env   # заполнить токены и пароль БД
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Автоматическая выкатка включается переменной окружения репозитория `DEPLOY_ENABLED=true`
+и секретами `SSH_HOST`, `SSH_USER`, `SSH_KEY`, `DEPLOY_PATH`. Без них шаг деплоя
+пропускается, а образ всё равно публикуется.
