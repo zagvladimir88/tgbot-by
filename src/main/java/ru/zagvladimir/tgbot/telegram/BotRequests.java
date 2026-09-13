@@ -1,5 +1,6 @@
 package ru.zagvladimir.tgbot.telegram;
 
+import java.util.Locale;
 import java.util.Optional;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.message.Message;
@@ -58,7 +59,7 @@ public final class BotRequests {
         return Optional.of(new BotRequest.Command(
                 message.getChatId(),
                 message.getFrom().getId(),
-                command.toLowerCase(),
+                command.toLowerCase(Locale.ROOT),
                 arguments,
                 replyToText,
                 fromGroup));

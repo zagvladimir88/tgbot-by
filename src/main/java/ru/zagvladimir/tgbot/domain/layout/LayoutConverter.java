@@ -14,7 +14,7 @@ public class LayoutConverter {
     private static final Map<Character, Character> LATIN_TO_CYRILLIC = buildMap(LATIN, CYRILLIC);
     private static final Map<Character, Character> CYRILLIC_TO_LATIN = buildMap(CYRILLIC, LATIN);
 
-    private static Map<Character, Character> buildMap(String from, String to) {
+    static Map<Character, Character> buildMap(String from, String to) {
         if (from.length() != to.length()) {
             throw new IllegalStateException("Раскладки разной длины: %d и %d".formatted(from.length(), to.length()));
         }
@@ -52,9 +52,9 @@ public class LayoutConverter {
         var latin = 0;
         for (var i = 0; i < text.length(); i++) {
             var character = text.charAt(i);
-            if (Character.UnicodeBlock.of(character) == Character.UnicodeBlock.CYRILLIC) {
+            if (Character.UnicodeBlock.CYRILLIC.equals(Character.UnicodeBlock.of(character))) {
                 cyrillic++;
-            } else if (character >= 'a' && character <= 'z' || character >= 'A' && character <= 'Z') {
+            } else if ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')) {
                 latin++;
             }
         }

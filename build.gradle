@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.spring.boot)
     alias(libs.plugins.spring.dependency.management)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.errorprone)
+    id 'jacoco'
 }
 
 group = 'ru.zagvladimir'
@@ -60,6 +62,9 @@ dependencies {
     testImplementation libs.wiremock
 
     testRuntimeOnly libs.junit.platform.launcher
+
+    errorprone libs.errorprone.core
+    errorprone libs.nullaway
 }
 
 dependencyManagement {
@@ -85,10 +90,74 @@ spotless {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+    options.errorprone {
+        disableWarningsInGeneratedCode = true
+        error 'NullAway'
+        option 'NullAway:AnnotatedPackages', 'ru.zagvladimir.tgbot'
+        option 'NullAway:JSpecifyMode', 'true'
+    }
+}
+
+tasks.named('compileTestJava') {
+    options.errorprone.enabled = false
 }
 
 tasks.named('test') {
     useJUnitPlatform()
     systemProperty 'file.encoding', 'UTF-8'
     systemProperty 'java.awt.headless', 'true'
+}
+
+jacoco {
+    toolVersion = libs.versions.jacoco.get()
+}
+
+def coverageExclusions = [
+        'ru/zagvladimir/tgbot/TgbotApplication.class',
+        'ru/zagvladimir/tgbot/**/package-info.class',
+        'ru/zagvladimir/tgbot/app/**',
+        'ru/zagvladimir/tgbot/**/dto/**',
+        'ru/zagvladimir/tgbot/**/*Configuration*',
+]
+
+tasks.named('test') {
+    finalizedBy 'jacocoTestReport'
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn 'test'
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: coverageExclusions)
+    }))
+}
+
+tasks.named('jacocoTestCoverageVerification') {
+    dependsOn 'jacocoTestReport'
+    classDirectories.setFrom(files(classDirectories.files.collect {
+        fileTree(dir: it, exclude: coverageExclusions)
+    }))
+    violationRules {
+        rule {
+            limit {
+                counter = 'INSTRUCTION'
+                minimum = 0.60
+            }
+        }
+        rule {
+            element = 'PACKAGE'
+            includes = ['ru.zagvladimir.tgbot.domain.layout', 'ru.zagvladimir.tgbot.telegram.format']
+            limit {
+                counter = 'INSTRUCTION'
+                minimum = 0.95
+            }
+        }
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'jacocoTestCoverageVerification'
 }

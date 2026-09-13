@@ -42,7 +42,7 @@ public class RatesCommandHandler implements CommandHandler {
     @Override
     public void handle(CommandContext context) {
         var codes = context.hasArguments()
-                ? Arrays.stream(context.arguments().split("[,\s]+"))
+                ? Arrays.stream(context.arguments().split("[,\\s]+"))
                         .filter(code -> !code.isBlank())
                         .toList()
                 : settings.find(context.chatId()).defaultCurrencies();

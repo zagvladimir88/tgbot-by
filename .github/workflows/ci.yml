@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Сборка и тесты
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Установить JDK 25 (компиляция) и JDK 21 (запуск Gradle)
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            25
+            21
+
+      - name: Настроить Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Собрать и проверить
+        run: ./gradlew build --build-cache --console=plain
+
+      - name: Отчёты о тестах
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results
+          path: |
+            build/reports/tests/test
+            build/test-results/test
+          retention-days: 14
+
+      - name: Отчёт о покрытии
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: jacoco-report
+          path: build/reports/jacoco/test
+          retention-days: 14
+
+      - name: Диаграммы модулей
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: modulith-docs
+          path: build/spring-modulith-docs
+          retention-days: 14
