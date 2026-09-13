@@ -1,0 +1,90 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository }}
+
+jobs:
+  image:
+    name: Образ в GHCR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Установить JDK 25 (компиляция) и JDK 21 (запуск Gradle)
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: |
+            25
+            21
+
+      - name: Настроить Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Собрать jar
+        run: ./gradlew bootJar --build-cache --console=plain
+
+      - name: Войти в GHCR
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Собрать и запушить образ
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    name: Выкатка на VPS
+    needs: image
+    runs-on: ubuntu-latest
+    environment: prod
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Скопировать compose на сервер
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: docker-compose.prod.yml
+          target: ${{ secrets.DEPLOY_PATH }}
+
+      - name: Перезапустить бота
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_PATH }}
+            export BOT_IMAGE=${{ needs.image.outputs.image }}
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
+            docker image prune -f
