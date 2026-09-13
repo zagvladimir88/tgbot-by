@@ -20,11 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Установить JDK 25
+      - name: Установить JDK 25 (компиляция) и JDK 21 (запуск Gradle)
         uses: actions/setup-java@v6
         with:
           distribution: temurin
-          java-version: '25'
+          java-version: |
+            25
+            21
 
       - name: Настроить Gradle
         uses: gradle/actions/setup-gradle@v6
