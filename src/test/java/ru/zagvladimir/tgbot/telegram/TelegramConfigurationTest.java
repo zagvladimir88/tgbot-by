@@ -1,4 +1,4 @@
-package ru.strjk.tgbot.telegram;
+package ru.zagvladimir.tgbot.telegram;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Import;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import ru.strjk.tgbot.TestcontainersConfiguration;
+import ru.zagvladimir.tgbot.TestcontainersConfiguration;
 
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest

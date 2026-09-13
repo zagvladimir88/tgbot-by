@@ -1,4 +1,4 @@
-package ru.strjk.tgbot.telegram.internal;
+package ru.zagvladimir.tgbot.telegram.internal;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
 import org.telegram.telegrambots.longpolling.TelegramBotsLongPollingApplication;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import ru.strjk.tgbot.telegram.BotProperties;
+import ru.zagvladimir.tgbot.telegram.BotProperties;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(BotProperties.class)

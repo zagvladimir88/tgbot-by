@@ -1,4 +1,4 @@
-package ru.strjk.tgbot;
+package ru.zagvladimir.tgbot;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

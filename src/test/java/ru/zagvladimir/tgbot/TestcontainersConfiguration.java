@@ -1,4 +1,4 @@
-package ru.strjk.tgbot;
+package ru.zagvladimir.tgbot;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
