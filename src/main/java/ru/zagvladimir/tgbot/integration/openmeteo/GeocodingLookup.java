@@ -2,6 +2,7 @@ package ru.zagvladimir.tgbot.integration.openmeteo;
 
 import java.time.ZoneId;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -40,7 +41,7 @@ public class GeocodingLookup {
                 zoneOf(first.timezone())));
     }
 
-    private static ZoneId zoneOf(String timezone) {
+    private static ZoneId zoneOf(@Nullable String timezone) {
         if (timezone == null || timezone.isBlank()) {
             return ChatSettings.DEFAULT_ZONE;
         }

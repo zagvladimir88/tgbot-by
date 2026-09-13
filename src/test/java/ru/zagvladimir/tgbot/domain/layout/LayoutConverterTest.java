@@ -1,6 +1,7 @@
 package ru.zagvladimir.tgbot.domain.layout;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -95,5 +96,17 @@ class LayoutConverterTest {
 
         assertThat(converted).hasSize(latin.length());
         assertThat(converted.chars().anyMatch(c -> c >= 'a' && c <= 'z')).isFalse();
+    }
+
+    @Test
+    void detectsDominantAlphabetForUppercaseLatin() {
+        assertThat(converter.convert("GHBDTN")).isEqualTo("ПРИВЕТ");
+    }
+
+    @Test
+    void rejectsLayoutsOfDifferentLength() {
+        assertThatThrownBy(() -> LayoutConverter.buildMap("abc", "ab"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("разной длины");
     }
 }

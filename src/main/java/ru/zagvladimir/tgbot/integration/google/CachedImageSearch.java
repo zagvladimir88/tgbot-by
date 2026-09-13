@@ -1,5 +1,6 @@
 package ru.zagvladimir.tgbot.integration.google;
 
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachePut;
@@ -33,8 +34,10 @@ public class CachedImageSearch implements ImageSearchPort {
     @Override
     @CachePut(cacheNames = CACHE, key = "#query + ':' + #start")
     public ImageSearchPage fetchPage(String query, int start) {
-        var response = api.search(
-                properties.apiKey(), properties.cx(), query, "image", properties.pageSize(), start, "active");
+        var apiKey = Objects.requireNonNull(properties.apiKey(), "bot.image.api-key не задан");
+        var cx = Objects.requireNonNull(properties.cx(), "bot.image.cx не задан");
+
+        var response = api.search(apiKey, cx, query, "image", properties.pageSize(), start, "active");
 
         return new ImageSearchPage(
                 query, start, GoogleCseMapper.toResults(response), GoogleCseMapper.hasMore(response));
