@@ -19,12 +19,17 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
     private final ExecutorService executor;
     private final CommandRegistry registry;
     private final MessageSender sender;
+    private final List<InlineHandler> inlineHandlers;
 
     UpdateDispatcher(
-            @Qualifier("botUpdateExecutor") ExecutorService executor, CommandRegistry registry, MessageSender sender) {
+            @Qualifier("botUpdateExecutor") ExecutorService executor,
+            CommandRegistry registry,
+            MessageSender sender,
+            List<InlineHandler> inlineHandlers) {
         this.executor = executor;
         this.registry = registry;
         this.sender = sender;
+        this.inlineHandlers = inlineHandlers;
     }
 
     @Override
@@ -62,7 +67,7 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
     private void dispatch(BotRequest request) {
         switch (request) {
             case BotRequest.Command command -> handleCommand(command);
-            case BotRequest.Inline inline -> log.debug("Inline-запрос ещё не поддерживается: {}", inline.query());
+            case BotRequest.Inline inline -> handleInline(inline);
             case BotRequest.Callback callback -> log.debug("Callback ещё не поддерживается: {}", callback.data());
         }
     }
@@ -77,6 +82,20 @@ class UpdateDispatcher implements LongPollingUpdateConsumer {
         }
 
         handler.handle(CommandContext.from(command));
+    }
+
+    private void handleInline(BotRequest.Inline inline) {
+        var results = inlineHandlers.stream()
+                .filter(handler -> handler.supports(inline.query()))
+                .findFirst()
+                .map(handler -> handler.results(inline.query()))
+                .orElseGet(List::of);
+
+        if (results.isEmpty()) {
+            return;
+        }
+
+        sender.answerInlineQuery(inline.queryId(), results);
     }
 
     private void reportFailure(BotContext context) {
