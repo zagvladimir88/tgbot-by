@@ -20,6 +20,7 @@ public class CacheConfiguration {
                 "geocoding",
                 Caffeine.newBuilder()
                         .expireAfterWrite(Duration.ofDays(30))
+                        .recordStats()
                         .maximumSize(1_000)
                         .build());
 
@@ -27,6 +28,7 @@ public class CacheConfiguration {
                 "forecast",
                 Caffeine.newBuilder()
                         .expireAfterWrite(Duration.ofMinutes(10))
+                        .recordStats()
                         .maximumSize(500)
                         .build());
 
@@ -34,6 +36,7 @@ public class CacheConfiguration {
                 "currency-directory",
                 Caffeine.newBuilder()
                         .expireAfterWrite(Duration.ofDays(1))
+                        .recordStats()
                         .maximumSize(10)
                         .build());
 
@@ -41,6 +44,7 @@ public class CacheConfiguration {
                 "image-search",
                 Caffeine.newBuilder()
                         .expireAfterWrite(Duration.ofHours(24))
+                        .recordStats()
                         .maximumSize(2_000)
                         .build());
 

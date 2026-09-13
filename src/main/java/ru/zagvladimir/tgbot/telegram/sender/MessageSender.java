@@ -1,6 +1,8 @@
 package ru.zagvladimir.tgbot.telegram.sender;
 
+import java.time.Duration;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -15,6 +17,7 @@ import org.telegram.telegrambots.meta.api.objects.inlinequery.result.InlineQuery
 import org.telegram.telegrambots.meta.api.objects.media.InputMediaPhoto;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Component
@@ -22,10 +25,14 @@ public class MessageSender {
 
     private static final Logger log = LoggerFactory.getLogger(MessageSender.class);
 
-    private final ObjectProvider<TelegramClient> telegramClient;
+    private static final int RETRY_ATTEMPTS_ON_FLOOD = 2;
 
-    MessageSender(ObjectProvider<TelegramClient> telegramClient) {
+    private final ObjectProvider<TelegramClient> telegramClient;
+    private final SendThrottle throttle;
+
+    MessageSender(ObjectProvider<TelegramClient> telegramClient, SendThrottle throttle) {
         this.telegramClient = telegramClient;
+        this.throttle = throttle;
     }
 
     public void sendText(long chatId, String text) {
@@ -147,10 +154,43 @@ public class MessageSender {
             return;
         }
 
+        throttle.acquire(Long.parseLong(message.getChatId()));
+
+        for (var attempt = 0; attempt <= RETRY_ATTEMPTS_ON_FLOOD; attempt++) {
+            try {
+                client.execute(message);
+                return;
+            } catch (TelegramApiRequestException e) {
+                var retryAfter = retryAfterOf(e);
+                if (retryAfter == null || attempt == RETRY_ATTEMPTS_ON_FLOOD) {
+                    log.error("Не удалось отправить сообщение в чат {}", message.getChatId(), e);
+                    return;
+                }
+
+                log.warn("Telegram просит подождать {} с перед отправкой в чат {}", retryAfter, message.getChatId());
+                if (!sleepSeconds(retryAfter)) {
+                    return;
+                }
+            } catch (TelegramApiException e) {
+                log.error("Не удалось отправить сообщение в чат {}", message.getChatId(), e);
+                return;
+            }
+        }
+    }
+
+    @Nullable
+    private static Integer retryAfterOf(TelegramApiRequestException e) {
+        var parameters = e.getParameters();
+        return parameters == null ? null : parameters.getRetryAfter();
+    }
+
+    private static boolean sleepSeconds(int seconds) {
         try {
-            client.execute(message);
-        } catch (TelegramApiException e) {
-            log.error("Не удалось отправить сообщение в чат {}", message.getChatId(), e);
+            Thread.sleep(Duration.ofSeconds(seconds));
+            return true;
+        } catch (InterruptedException interrupted) {
+            Thread.currentThread().interrupt();
+            return false;
         }
     }
 }

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -84,7 +85,13 @@ class UpdateDispatcherTest {
     }
 
     private UpdateDispatcher dispatcherWith(CommandHandler handler) {
-        return new UpdateDispatcher(executor, new CommandRegistry(List.of(handler)), sender, List.of(), List.of());
+        return new UpdateDispatcher(
+                executor,
+                new CommandRegistry(List.of(handler)),
+                sender,
+                List.of(),
+                List.of(),
+                new BotMetrics(new SimpleMeterRegistry()));
     }
 
     private static Update commandUpdate(String text, String chatType) {

@@ -11,6 +11,7 @@ errorprone-plugin = "4.3.0"
 errorprone = "2.39.0"
 nullaway = "0.12.7"
 jacoco = "0.8.13"
+bucket4j = "8.14.0"
 
 [libraries]
 spring-modulith-bom = { module = "org.springframework.modulith:spring-modulith-bom", version.ref = "spring-modulith" }
@@ -30,6 +31,7 @@ telegrambots-client = { module = "org.telegram:telegrambots-client", version.ref
 
 flyway-database-postgresql = { module = "org.flywaydb:flyway-database-postgresql" }
 postgresql = { module = "org.postgresql:postgresql" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus" }
 
 spring-modulith-starter-core = { module = "org.springframework.modulith:spring-modulith-starter-core" }
 spring-modulith-starter-jdbc = { module = "org.springframework.modulith:spring-modulith-starter-jdbc" }
@@ -40,6 +42,7 @@ spring-modulith-runtime = { module = "org.springframework.modulith:spring-moduli
 jspecify = { module = "org.jspecify:jspecify" }
 caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 jfreechart = { module = "org.jfree:jfreechart", version.ref = "jfreechart" }
+bucket4j = { module = "com.bucket4j:bucket4j_jdk17-core", version.ref = "bucket4j" }
 errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
 nullaway = { module = "com.uber.nullaway:nullaway", version.ref = "nullaway" }
 
