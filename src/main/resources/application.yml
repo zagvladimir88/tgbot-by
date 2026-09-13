@@ -1,6 +1,9 @@
 spring:
   application:
     name: tgbot
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/tgbot}
     username: ${DB_USER:tgbot}

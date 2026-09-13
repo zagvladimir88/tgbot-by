@@ -34,8 +34,11 @@ Testcontainers · GitHub Actions → GHCR → VPS
 
 ```bash
 docker compose up -d postgres
-BOT_TOKEN=<token> ./gradlew bootRun
+BOT_TELEGRAM_TOKEN=<token> ./gradlew bootRun
 ```
+
+Без `BOT_TELEGRAM_TOKEN` приложение стартует, но к Telegram не подключается — это нужно,
+чтобы сборка и тесты не требовали секрета.
 
 Секреты передаются только через переменные окружения и в репозиторий не попадают.
 
