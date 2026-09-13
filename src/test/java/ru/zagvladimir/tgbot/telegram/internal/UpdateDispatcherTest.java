@@ -81,7 +81,7 @@ class UpdateDispatcherTest {
     }
 
     private UpdateDispatcher dispatcherWith(CommandHandler handler) {
-        return new UpdateDispatcher(executor, new CommandRegistry(List.of(handler)), sender, List.of());
+        return new UpdateDispatcher(executor, new CommandRegistry(List.of(handler)), sender, List.of(), List.of());
     }
 
     private static Update commandUpdate(String text, String chatType) {
