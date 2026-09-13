@@ -25,18 +25,21 @@ public class UpdateDispatcher implements LongPollingUpdateConsumer {
     private final MessageSender sender;
     private final List<InlineHandler> inlineHandlers;
     private final List<CallbackHandler> callbackHandlers;
+    private final BotMetrics metrics;
 
     UpdateDispatcher(
             @Qualifier("botUpdateExecutor") ExecutorService executor,
             CommandRegistry registry,
             MessageSender sender,
             List<InlineHandler> inlineHandlers,
-            List<CallbackHandler> callbackHandlers) {
+            List<CallbackHandler> callbackHandlers,
+            BotMetrics metrics) {
         this.executor = executor;
         this.registry = registry;
         this.sender = sender;
         this.inlineHandlers = inlineHandlers;
         this.callbackHandlers = callbackHandlers;
+        this.metrics = metrics;
     }
 
     @Override
@@ -82,13 +85,20 @@ public class UpdateDispatcher implements LongPollingUpdateConsumer {
     private void handleCommand(BotRequest.Command command) {
         var handler = registry.find(command.command()).orElse(null);
         if (handler == null) {
+            metrics.unknownCommand();
             if (!command.fromGroup()) {
                 sender.sendText(command.chatId(), "Не знаю такой команды. Что я умею — /help");
             }
             return;
         }
 
-        handler.handle(CommandContext.from(command));
+        try {
+            handler.handle(CommandContext.from(command));
+            metrics.commandHandled(command.command());
+        } catch (RuntimeException e) {
+            metrics.commandFailed(command.command());
+            throw e;
+        }
     }
 
     private void handleInline(BotRequest.Inline inline) {
