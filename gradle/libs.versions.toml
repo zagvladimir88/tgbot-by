@@ -5,6 +5,7 @@ spring-modulith = "2.1.1"
 spotless = "7.0.4"
 palantir-java-format = "2.68.0"
 telegrambots = "9.0.0"
+wiremock = "3.13.1"
 
 [libraries]
 spring-modulith-bom = { module = "org.springframework.modulith:spring-modulith-bom", version.ref = "spring-modulith" }
@@ -15,6 +16,7 @@ spring-boot-starter-data-jdbc = { module = "org.springframework.boot:spring-boot
 spring-boot-starter-flyway = { module = "org.springframework.boot:spring-boot-starter-flyway" }
 spring-boot-starter-validation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-restclient = { module = "org.springframework.boot:spring-boot-starter-restclient" }
 spring-boot-docker-compose = { module = "org.springframework.boot:spring-boot-docker-compose" }
 spring-boot-configuration-processor = { module = "org.springframework.boot:spring-boot-configuration-processor" }
 
@@ -31,6 +33,7 @@ spring-modulith-observability-core = { module = "org.springframework.modulith:sp
 spring-modulith-actuator = { module = "org.springframework.modulith:spring-modulith-actuator" }
 spring-modulith-runtime = { module = "org.springframework.modulith:spring-modulith-runtime" }
 jspecify = { module = "org.jspecify:jspecify" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine" }
 
 spring-boot-starter-actuator-test = { module = "org.springframework.boot:spring-boot-starter-actuator-test" }
 spring-boot-starter-cache-test = { module = "org.springframework.boot:spring-boot-starter-cache-test" }
@@ -44,6 +47,7 @@ spring-modulith-docs = { module = "org.springframework.modulith:spring-modulith-
 testcontainers-junit-jupiter = { module = "org.testcontainers:testcontainers-junit-jupiter" }
 testcontainers-postgresql = { module = "org.testcontainers:testcontainers-postgresql" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+wiremock = { module = "org.wiremock:wiremock-standalone", version.ref = "wiremock" }
 
 [plugins]
 spring-boot = { id = "org.springframework.boot", version.ref = "spring-boot" }
